@@ -115,7 +115,7 @@ function App() {
           <p>Hi, I&apos;m Stephen.</p>
           <p className="bio">
             I&apos;m a software engineer at Wing, working on automating traffic management for UAVs. In the past, I worked at DoorDash where I created agentic workflows to
-            automate fraud and customer support processes.
+            automate fraud detection and customer support processes.
           </p>
         </section>
       </main>
