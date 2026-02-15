@@ -13,7 +13,9 @@ function App() {
       return { type: 'project-detail', id: path.replace('/projects/', '') }
     }
     if (path === '/projects') return { type: 'projects' }
-    return { type: 'home' }
+    if (path === '/') return { type: 'home' }
+    // Unknown route — show chess puzzle
+    return { type: 'project-detail', id: 'chess-puzzles' }
   })
 
   useEffect(() => {
@@ -23,8 +25,10 @@ function App() {
         setPage({ type: 'project-detail', id: path.replace('/projects/', '') })
       } else if (path === '/projects') {
         setPage({ type: 'projects' })
-      } else {
+      } else if (path === '/') {
         setPage({ type: 'home' })
+      } else {
+        setPage({ type: 'project-detail', id: 'chess-puzzles' })
       }
     }
 
