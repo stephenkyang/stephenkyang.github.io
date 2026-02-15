@@ -48,7 +48,6 @@
   font-size: 0.95rem;
   cursor: pointer;
   padding: 0;
-  text-decoration: underline;
   color: #1a1a1a;
   font-weight: inherit;
 }
@@ -105,7 +104,6 @@
   margin: 0;
   font-size: 1rem;
   font-weight: inherit;
-  text-decoration: underline;
 }
 
 .back-link {
@@ -114,7 +112,6 @@
   font-size: 0.85rem;
   cursor: pointer;
   padding: 0;
-  text-decoration: underline;
   color: #1a1a1a;
   font-weight: inherit;
 }
@@ -179,7 +176,6 @@
   font-size: 0.85rem;
   cursor: pointer;
   padding: 0;
-  text-decoration: underline;
   color: #999;
   font-weight: 400;
 }
@@ -198,7 +194,6 @@
   font-size: 0.85rem;
   cursor: pointer;
   padding: 0;
-  text-decoration: underline;
   color: #555;
   font-weight: 400;
 }
