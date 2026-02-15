@@ -227,16 +227,23 @@
   .vibecoded {
     bottom: 1.5rem;
     right: 1.5rem;
+    max-width: 40%;
+    text-align: right;
+    font-size: 0.75rem;
   }
 
   .bottom-home-link {
     bottom: 1.5rem;
     left: 1.5rem;
+    max-width: 40%;
   }
 
   .recent-project {
     bottom: 1.5rem;
     left: 1.5rem;
+    max-width: 55%;
+    text-align: left;
+    font-size: 0.75rem;
   }
 
   .landing {
