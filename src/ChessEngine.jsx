@@ -68,23 +68,30 @@ function flipUci(uci) {
   return result
 }
 
-// ── Temperature-scaled sampling ───────────────────────────────
+// ── Move selection helpers ────────────────────────────────────
 
-function sampleWithTemperature(probs, temperature = 1.2) {
-  const logits = probs.map((p) => Math.log(Math.max(p, 1e-10)))
-  const scaled = logits.map((l) => l / temperature)
-  const maxScaled = Math.max(...scaled)
-  const exps = scaled.map((s) => Math.exp(s - maxScaled))
-  const sumExps = exps.reduce((a, b) => a + b, 0)
-  const softmax = exps.map((e) => e / sumExps)
+const PIECE_VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 }
 
-  const r = Math.random()
-  let cumulative = 0
-  for (let i = 0; i < softmax.length; i++) {
-    cumulative += softmax[i]
-    if (r <= cumulative) return i
+function isHangingMove(game, uci) {
+  const test = new Chess(game.fen())
+  const move = test.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.length > 4 ? uci[4] : undefined })
+  if (!move) return false
+  // Check if opponent can now capture something valuable
+  const responses = test.moves({ verbose: true })
+  const captured = responses.filter((r) => r.captured)
+  for (const resp of captured) {
+    const capturedVal = PIECE_VALUES[resp.captured] || 0
+    // If they can take something worth more than what we just captured, it's hanging
+    const weCapturedVal = move.captured ? (PIECE_VALUES[move.captured] || 0) : 0
+    if (capturedVal > weCapturedVal + 1) return true
   }
-  return softmax.length - 1
+  // Check if the move walks into checkmate
+  if (responses.some((r) => {
+    const t2 = new Chess(test.fen())
+    t2.move(r)
+    return t2.isCheckmate()
+  })) return true
+  return false
 }
 
 // ── Component ─────────────────────────────────────────────────
@@ -180,10 +187,17 @@ export default function ChessEngine() {
         return { from: legal[randomIdx].from, to: legal[randomIdx].to, promotion: legal[randomIdx].promotion }
       }
 
-      // Sample from candidates using temperature
-      const candidateProbs = candidates.map((c) => c.prob)
-      const chosenIdx = sampleWithTemperature(candidateProbs, 0.5)
-      const chosen = candidates[chosenIdx].uci
+      // Sort by model confidence, pick best non-hanging move
+      candidates.sort((a, b) => b.prob - a.prob)
+
+      // Try top candidates, skip ones that hang material
+      let chosen = candidates[0].uci
+      for (const c of candidates.slice(0, 5)) {
+        if (!isHangingMove(currentGame, c.uci)) {
+          chosen = c.uci
+          break
+        }
+      }
 
       return {
         from: chosen.slice(0, 2),
