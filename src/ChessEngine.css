@@ -1,0 +1,142 @@
+.chess-engine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chess-engine .engine-info {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.chess-engine .chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: min(400px, calc(100vw - 3rem));
+  height: min(400px, calc(100vw - 3rem));
+  border: 1px solid #1a1a1a;
+}
+
+.chess-engine .chess-square {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.chess-engine .chess-piece-img {
+  width: 85%;
+  height: 85%;
+}
+
+.chess-engine .chess-piece-img[draggable='true'] {
+  cursor: grab;
+}
+
+.chess-engine .chess-piece-img[draggable='true']:active {
+  cursor: grabbing;
+}
+
+.chess-engine .chess-square.light {
+  background: #f0d9b5;
+}
+
+.chess-engine .chess-square.dark {
+  background: #b58863;
+}
+
+.chess-engine .chess-square.selected {
+  background: #829769;
+}
+
+.chess-engine .chess-square.legal-target::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.chess-engine .chess-square.legal-target.has-piece::after {
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: transparent;
+  border: 3px solid rgba(0, 0, 0, 0.2);
+}
+
+.chess-engine .chess-square.last-move.light {
+  background: #cdd16a;
+}
+
+.chess-engine .chess-square.last-move.dark {
+  background: #aaa23a;
+}
+
+.engine-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.engine-status {
+  font-size: 0.9rem;
+  min-height: 1.4rem;
+}
+
+.engine-status.won {
+  color: #2e7d32;
+}
+
+.engine-status.lost {
+  color: #c62828;
+}
+
+.new-game-btn {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid #1a1a1a;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.new-game-btn:hover {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.move-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  max-width: min(400px, calc(100vw - 3rem));
+  font-size: 0.8rem;
+  color: #555;
+  max-height: 6rem;
+  overflow-y: auto;
+}
+
+.move-entry {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.move-number {
+  color: #999;
+}
+
+.engine-loading {
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.engine-error {
+  color: #c62828;
+  font-size: 0.85rem;
+}

@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import './App.css'
 import ChessPuzzle from './ChessPuzzle'
 import WritingDetail from './WritingDetail'
 import writings, { TAGS } from './writings'
 import Hemicycle from './Hemicycle'
 
+const ChessEngine = lazy(() => import('./ChessEngine'))
+
 const projects = [
+  { id: 'chess-engine', title: 'play chess with me' },
   { id: 'chess-puzzles', title: 'play a chess puzzle!' },
 ]
 
@@ -136,7 +139,11 @@ function App() {
           </button>
         </header>
         <div className="project-detail">
-          {page.id === 'chess-puzzles' ? <ChessPuzzle /> : page.id === 'taiwan-hemicycle' ? <Hemicycle /> : <p>TBD</p>}
+          {page.id === 'chess-engine' ? (
+            <Suspense fallback={<p style={{ color: '#555', fontSize: '0.85rem' }}>Loading chess engine...</p>}>
+              <ChessEngine />
+            </Suspense>
+          ) : page.id === 'chess-puzzles' ? <ChessPuzzle /> : page.id === 'taiwan-hemicycle' ? <Hemicycle /> : <p>TBD</p>}
         </div>
         <button className="bottom-home-link" onClick={() => setPage({ type: 'home' })}>
           Home
@@ -219,8 +226,8 @@ function App() {
         </section>
       </main>
 
-      <button className="recent-project" onClick={() => setPage({ type: 'project-detail', id: 'chess-puzzles' })}>
-        last update: play a chess puzzle! (feb 2026)
+      <button className="recent-project" onClick={() => setPage({ type: 'project-detail', id: 'chess-engine' })}>
+        last update: play chess with me (feb 2026)
       </button>
 
       <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
