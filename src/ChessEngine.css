@@ -140,3 +140,15 @@
   color: #c62828;
   font-size: 0.85rem;
 }
+
+.engine-explanation {
+  font-size: 0.75rem;
+  color: #999;
+  max-width: min(400px, calc(100vw - 3rem));
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.engine-explanation a {
+  color: #999;
+}

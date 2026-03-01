@@ -182,7 +182,7 @@ export default function ChessEngine() {
 
       // Sample from candidates using temperature
       const candidateProbs = candidates.map((c) => c.prob)
-      const chosenIdx = sampleWithTemperature(candidateProbs, 1.2)
+      const chosenIdx = sampleWithTemperature(candidateProbs, 0.5)
       const chosen = candidates[chosenIdx].uci
 
       return {
@@ -372,7 +372,7 @@ export default function ChessEngine() {
   return (
     <div className="chess-engine">
       <div className="engine-info">
-        <span>you (white) vs stevyk6&apos;s brain (black)</span>
+        <span>you vs me</span>
       </div>
       <div className="chess-board">
         {board.map((row, rowIdx) => {
@@ -433,6 +433,9 @@ export default function ChessEngine() {
           ))}
         </div>
       )}
+      <p className="engine-explanation">
+        this model was trained on my {'\u007E'}2,400 rated games on <a href="https://lichess.org/@/stevyk6" target="_blank" rel="noopener noreferrer">lichess</a>. it learned how i play, not how to play well.
+      </p>
     </div>
   )
 }
