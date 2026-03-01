@@ -1,0 +1,117 @@
+.hemicycle-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hemicycle-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin: 0;
+  text-align: center;
+}
+
+.hemicycle-svg {
+  width: 100%;
+  height: auto;
+}
+
+.hemicycle-seat {
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+}
+
+.hemicycle-seat:hover {
+  opacity: 0.5;
+}
+
+.hemicycle-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: -2rem;
+  color: #1a1a1a;
+}
+
+.hemicycle-label {
+  font-size: 0.85rem;
+  color: #999;
+  margin-bottom: 1.5rem;
+}
+
+.hemicycle-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: center;
+}
+
+.hemicycle-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.hemicycle-legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.hemicycle-outline-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: #777;
+  margin-top: 0.75rem;
+}
+
+.hemicycle-tooltip {
+  position: fixed;
+  transform: translate(-50%, -120%);
+  background: #1a1a1a;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  pointer-events: auto;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.hemicycle-tooltip-name {
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: #fff;
+  text-decoration: underline;
+  display: block;
+}
+
+.hemicycle-tooltip-context {
+  color: #ccc;
+  font-size: 0.7rem;
+  margin-bottom: 3px;
+}
+
+.hemicycle-tooltip-trip a {
+  color: #8cb4ff;
+  font-size: 0.7rem;
+  text-decoration: underline;
+}
+
+.hemicycle-outline-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2.5px solid #ff3333;
+  background: transparent;
+  flex-shrink: 0;
+}

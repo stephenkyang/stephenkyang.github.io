@@ -37,9 +37,8 @@
 
 .nav-links {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.15rem;
+  align-items: baseline;
+  gap: 1.5rem;
 }
 
 .nav-link {
@@ -152,6 +151,100 @@
   color: #999;
 }
 
+/* Writing tags filter */
+.writing-tags {
+  max-width: 640px;
+  margin: 2.5rem auto 0;
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.writing-tag {
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  color: #999;
+  font-weight: inherit;
+}
+
+.writing-tag:hover {
+  color: #1a1a1a;
+}
+
+.writing-tag-active {
+  color: #1a1a1a;
+}
+
+/* Writing list */
+.writing-list {
+  max-width: 640px;
+  margin: 1.5rem auto 0;
+}
+
+.writing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 1rem 0;
+  cursor: pointer;
+}
+
+.writing-row:hover .writing-row-title {
+  color: #555;
+}
+
+.writing-row-title {
+  margin: 0;
+}
+
+.writing-row-date {
+  font-size: 0.85rem;
+  color: #999;
+  flex-shrink: 0;
+  margin-left: 2rem;
+}
+
+/* Writing detail */
+.writing-detail-wrapper {
+  max-width: 600px;
+  margin: 4rem auto 0;
+  width: 100%;
+}
+
+.writing-detail-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.writing-detail-date {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0 0 2rem;
+}
+
+.writing-detail-image {
+  display: block;
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 4px;
+  margin: 0 auto 2rem;
+}
+
+.writing-detail-content p {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #333;
+  margin: 0 0 1.2rem;
+  font-weight: 400;
+}
+
 /* Project detail */
 .project-detail {
   max-width: 640px;
@@ -202,6 +295,40 @@
   color: #1a1a1a;
 }
 
+/* 404 page */
+.not-found-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+  padding: 2.5rem 3.5rem;
+  background: #fff;
+}
+
+.not-found-text {
+  font-size: 1rem;
+  color: #555;
+  margin: 0 0 1rem;
+}
+
+.not-found-home {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  color: #999;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-align: center;
+  width: 100%;
+}
+
+.not-found-home:hover {
+  color: #1a1a1a;
+}
+
 /* Vibecoded tag */
 .vibecoded {
   position: fixed;
@@ -210,6 +337,17 @@
   font-size: 0.85rem;
   color: #999;
   font-weight: 400;
+  text-align: right;
+  line-height: 1.4;
+}
+
+.vibecoded a {
+  color: #999;
+  text-decoration: underline;
+}
+
+.vibecoded a:hover {
+  color: #555;
 }
 
 /* Responsive */
