@@ -4,16 +4,30 @@ import ChessPuzzle from './ChessPuzzle'
 import WritingDetail from './WritingDetail'
 import writings, { TAGS } from './writings'
 import Hemicycle from './Hemicycle'
+import PairsTrading from './PairsTrading'
 
 const ChessEngine = lazy(() => import('./ChessEngine'))
 
 const projects = [
-  { id: 'chess-engine', title: 'play chess with me' },
-  { id: 'chess-puzzles', title: 'play a chess puzzle!' },
+  { id: 'chess-engine', title: 'play chess with me', date: 'feb 2026' },
+  { id: 'pairs-trading', title: 'freshman year pairs trading', date: 'mar 2026' },
 ]
 
 function App() {
   const [filter, setFilter] = useState('all')
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') || 'dark'
+    }
+    return 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
 
   const [page, setPage] = useState(() => {
     const path = typeof window !== 'undefined' ? window.location.pathname : '/'
@@ -80,7 +94,10 @@ function App() {
         <button className="bottom-home-link" onClick={() => setPage({ type: 'home' })}>
           home
         </button>
-        <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        <div className="bottom-right">
+          <button className="theme-toggle" onClick={toggleTheme}>{theme === 'dark' ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> light</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> dark</>}</button>
+          <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        </div>
       </div>
     )
   }
@@ -122,7 +139,10 @@ function App() {
         <button className="bottom-home-link" onClick={() => setPage({ type: 'home' })}>
           home
         </button>
-        <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        <div className="bottom-right">
+          <button className="theme-toggle" onClick={toggleTheme}>{theme === 'dark' ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> light</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> dark</>}</button>
+          <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        </div>
       </div>
     )
   }
@@ -143,12 +163,15 @@ function App() {
             <Suspense fallback={<p style={{ color: '#555', fontSize: '0.85rem' }}>Loading chess engine...</p>}>
               <ChessEngine />
             </Suspense>
-          ) : page.id === 'chess-puzzles' ? <ChessPuzzle /> : page.id === 'taiwan-hemicycle' ? <Hemicycle /> : <p>TBD</p>}
+          ) : page.id === 'chess-puzzles' ? <ChessPuzzle /> : page.id === 'taiwan-hemicycle' ? <Hemicycle /> : page.id === 'pairs-trading' ? <PairsTrading /> : <p>TBD</p>}
         </div>
         <button className="bottom-home-link" onClick={() => setPage({ type: 'home' })}>
           Home
         </button>
-        <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        <div className="bottom-right">
+          <button className="theme-toggle" onClick={toggleTheme}>{theme === 'dark' ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> light</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> dark</>}</button>
+          <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        </div>
       </div>
     )
   }
@@ -171,27 +194,30 @@ function App() {
     return (
       <div className="projects-page">
         <header className="projects-header">
-          <h2>Projects</h2>
+          <h2>projects</h2>
           <button className="back-link" onClick={() => setPage({ type: 'home' })}>
-            Back
+            back
           </button>
         </header>
-        <div className="project-list">
+        <div className="writing-list">
           {projects.map((project) => (
             <div
               key={project.id}
-              className="project-row"
+              className="writing-row"
               onClick={() => setPage({ type: 'project-detail', id: project.id })}
             >
-              <p className="project-row-title">{project.title}</p>
-              <span className="project-row-arrow">&rarr;</span>
+              <p className="writing-row-title">{project.title}</p>
+              <span className="writing-row-date">{project.date}</span>
             </div>
           ))}
         </div>
         <button className="bottom-home-link" onClick={() => setPage({ type: 'home' })}>
-          Home
+          home
         </button>
-        <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        <div className="bottom-right">
+          <button className="theme-toggle" onClick={toggleTheme}>{theme === 'dark' ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> light</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> dark</>}</button>
+          <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+        </div>
       </div>
     )
   }
@@ -230,7 +256,10 @@ function App() {
         last update: play chess with me (feb 2026)
       </button>
 
-      <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+      <div className="bottom-right">
+        <button className="theme-toggle" onClick={toggleTheme}>{theme === 'dark' ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> light</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> dark</>}</button>
+        <span className="vibecoded">100% vibecoded (it shows)<br />website inspired by my friend <a href="https://tedchai.com" target="_blank" rel="noopener noreferrer">Ted</a></span>
+      </div>
     </div>
   )
 }

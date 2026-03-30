@@ -7,7 +7,7 @@
 
 .chess-puzzle .puzzle-info {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--text-secondary);
   display: flex;
   gap: 1.5rem;
 }
@@ -18,7 +18,7 @@
   grid-template-rows: repeat(8, 1fr);
   width: min(400px, calc(100vw - 3rem));
   height: min(400px, calc(100vw - 3rem));
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--border);
 }
 
 .chess-square {
@@ -48,7 +48,7 @@
 }
 
 .chess-square.dark {
-  background: #b58863;
+  background: #c49b6e;
 }
 
 .chess-square.selected {
@@ -86,19 +86,19 @@
 }
 
 .puzzle-status.correct {
-  color: #2e7d32;
+  color: var(--success);
 }
 
 .puzzle-status.wrong {
-  color: #c62828;
+  color: var(--error);
 }
 
 .puzzle-loading {
-  color: #555;
+  color: var(--text-secondary);
   font-size: 0.85rem;
 }
 
 .puzzle-error {
-  color: #c62828;
+  color: var(--error);
   font-size: 0.85rem;
 }

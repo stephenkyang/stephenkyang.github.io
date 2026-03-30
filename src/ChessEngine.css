@@ -6,8 +6,38 @@
 }
 
 .chess-engine .engine-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--text-secondary);
+}
+
+.player-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.vs-separator {
+  color: var(--text-muted);
+}
+
+.color-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.color-dot.white {
+  background: #e0e0e0;
+  border: 1px solid var(--text-muted);
+}
+
+.color-dot.black {
+  background: #1a1a1a;
+  border: 1px solid var(--text-muted);
 }
 
 .chess-engine .chess-board {
@@ -16,7 +46,8 @@
   grid-template-rows: repeat(8, 1fr);
   width: min(400px, calc(100vw - 3rem));
   height: min(400px, calc(100vw - 3rem));
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--border);
+  position: relative;
 }
 
 .chess-engine .chess-square {
@@ -46,7 +77,7 @@
 }
 
 .chess-engine .chess-square.dark {
-  background: #b58863;
+  background: #c49b6e;
 }
 
 .chess-engine .chess-square.selected {
@@ -90,25 +121,26 @@
 }
 
 .engine-status.won {
-  color: #2e7d32;
+  color: var(--success);
 }
 
 .engine-status.lost {
-  color: #c62828;
+  color: var(--error);
 }
 
 .new-game-btn {
   font-size: 0.85rem;
   padding: 0.3rem 0.8rem;
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--text);
   background: transparent;
   cursor: pointer;
   font-family: inherit;
+  color: var(--text);
 }
 
 .new-game-btn:hover {
-  background: #1a1a1a;
-  color: #fff;
+  background: var(--text);
+  color: var(--bg);
 }
 
 .move-history {
@@ -117,7 +149,7 @@
   gap: 0.3rem;
   max-width: min(400px, calc(100vw - 3rem));
   font-size: 0.8rem;
-  color: #555;
+  color: var(--text-secondary);
   max-height: 6rem;
   overflow-y: auto;
 }
@@ -128,27 +160,104 @@
 }
 
 .move-number {
-  color: #999;
+  color: var(--text-muted);
 }
 
 .engine-loading {
-  color: #555;
+  color: var(--text-secondary);
   font-size: 0.85rem;
 }
 
 .engine-error {
-  color: #c62828;
+  color: var(--error);
   font-size: 0.85rem;
 }
 
 .engine-explanation {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-muted);
   max-width: min(400px, calc(100vw - 3rem));
   text-align: center;
   margin-top: 0.5rem;
 }
 
 .engine-explanation a {
-  color: #999;
+  color: var(--link);
+}
+
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.color-picker p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.color-options {
+  display: flex;
+  gap: 1rem;
+}
+
+.color-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--color-btn-bg);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.color-btn img {
+  width: 48px;
+  height: 48px;
+}
+
+.color-btn:hover {
+  background: var(--border);
+}
+
+.promotion-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.promotion-picker {
+  position: absolute;
+  top: 0;
+  left: calc(var(--promo-col) * 12.5%);
+  width: 12.5%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.promotion-option {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #f0d9b5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.promotion-option:hover {
+  background: #829769;
+}
+
+.promotion-option img {
+  width: 85%;
+  height: 85%;
 }

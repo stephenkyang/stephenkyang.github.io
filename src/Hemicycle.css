@@ -11,7 +11,7 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.1rem;
   font-weight: 400;
-  color: #1a1a1a;
+  color: var(--text);
   margin: 0;
   text-align: center;
 }
@@ -34,12 +34,12 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-top: -2rem;
-  color: #1a1a1a;
+  color: var(--text);
 }
 
 .hemicycle-label {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
 }
 
@@ -55,7 +55,7 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.8rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .hemicycle-legend-swatch {
@@ -70,7 +70,7 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.75rem;
-  color: #777;
+  color: var(--text-secondary);
   margin-top: 0.75rem;
 }
 

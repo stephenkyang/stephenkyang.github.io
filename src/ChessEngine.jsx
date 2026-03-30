@@ -8,14 +8,14 @@ function pieceImgUrl(color, type) {
   return `https://lichess1.org/assets/piece/cburnett/${color === 'w' ? 'w' : 'b'}${PIECE_NAMES[type]}.svg`
 }
 
-// ── Board encoding (mirrors Python train.py exactly) ──────────
+// ── LC0/Maia board encoding (112 input planes) ───────────────
 
-const PIECE_TO_CHANNEL = { p: 0, n: 1, b: 2, r: 3, q: 4, k: 5 }
+const PIECE_TO_PLANE = { p: 0, n: 1, b: 2, r: 3, q: 4, k: 5 }
 const FILES = 'abcdefgh'
 const RANKS = '12345678'
 
 function encodeBoardForModel(game) {
-  const board = new Float32Array(8 * 8 * 12)
+  const planes = new Float32Array(8 * 8 * 112)
   const isBlack = game.turn() === 'b'
 
   for (let sq = 0; sq < 64; sq++) {
@@ -26,66 +26,110 @@ function encodeBoardForModel(game) {
     if (!piece) continue
 
     let row = rank
-    let col = file
-    if (isBlack) {
-      row = 7 - row
-      col = 7 - col
-    }
+    if (isBlack) row = 7 - row
 
-    const channel = PIECE_TO_CHANNEL[piece.type]
-    const isFriendly = (piece.color === 'w' && !isBlack) || (piece.color === 'b' && isBlack)
-    const offset = isFriendly ? channel : channel + 6
-    board[(row * 8 + col) * 12 + offset] = 1.0
+    const plane = PIECE_TO_PLANE[piece.type]
+    const isOurs = (piece.color === 'w' && !isBlack) || (piece.color === 'b' && isBlack)
+    const offset = isOurs ? plane : plane + 6
+    planes[(row * 8 + file) * 112 + offset] = 1.0
   }
 
-  // Auxiliary features
-  const aux = new Float32Array(5)
-  aux[0] = 1.0 // side to move is always "us"
+  // Castling rights (planes 104-107)
   const fen = game.fen()
   const castling = fen.split(' ')[2]
   if (!isBlack) {
-    aux[1] = castling.includes('K') ? 1 : 0
-    aux[2] = castling.includes('Q') ? 1 : 0
-    aux[3] = castling.includes('k') ? 1 : 0
-    aux[4] = castling.includes('q') ? 1 : 0
+    if (castling.includes('K')) for (let i = 0; i < 64; i++) planes[i * 112 + 104] = 1.0
+    if (castling.includes('Q')) for (let i = 0; i < 64; i++) planes[i * 112 + 105] = 1.0
+    if (castling.includes('k')) for (let i = 0; i < 64; i++) planes[i * 112 + 106] = 1.0
+    if (castling.includes('q')) for (let i = 0; i < 64; i++) planes[i * 112 + 107] = 1.0
   } else {
-    aux[1] = castling.includes('k') ? 1 : 0
-    aux[2] = castling.includes('q') ? 1 : 0
-    aux[3] = castling.includes('K') ? 1 : 0
-    aux[4] = castling.includes('Q') ? 1 : 0
+    if (castling.includes('k')) for (let i = 0; i < 64; i++) planes[i * 112 + 104] = 1.0
+    if (castling.includes('q')) for (let i = 0; i < 64; i++) planes[i * 112 + 105] = 1.0
+    if (castling.includes('K')) for (let i = 0; i < 64; i++) planes[i * 112 + 106] = 1.0
+    if (castling.includes('Q')) for (let i = 0; i < 64; i++) planes[i * 112 + 107] = 1.0
   }
 
-  return { board, aux }
+  // Side to move (plane 108)
+  for (let i = 0; i < 64; i++) planes[i * 112 + 108] = 1.0
+
+  // Move count (plane 111)
+  const moveNum = parseInt(fen.split(' ')[5]) || 1
+  const normalized = Math.min(moveNum / 100.0, 1.0)
+  for (let i = 0; i < 64; i++) planes[i * 112 + 111] = normalized
+
+  return planes
 }
 
-function flipUci(uci) {
-  const f1 = FILES[7 - FILES.indexOf(uci[0])]
-  const r1 = RANKS[7 - RANKS.indexOf(uci[1])]
-  const f2 = FILES[7 - FILES.indexOf(uci[2])]
-  const r2 = RANKS[7 - RANKS.indexOf(uci[3])]
-  let result = f1 + r1 + f2 + r2
-  if (uci.length > 4) result += uci[4]
-  return result
+// ── LC0 convolution policy mapping ──────────────────────────
+// Model outputs (8,8,80) flattened to 5120. Each move maps to one index.
+// Must match LC0 encoder.cc direction definitions exactly.
+
+// Queen directions: (rank_delta, file_delta)
+const QUEEN_DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]]
+// Knight directions
+const KNIGHT_DIRS = [[2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2], [1, -2], [2, -1]]
+
+function moveToPolicyIndex(game, move) {
+  const isBlack = game.turn() === 'b'
+  const fromFile = FILES.indexOf(move.from[0])
+  const fromRank = RANKS.indexOf(move.from[1])
+  const toFile = FILES.indexOf(move.to[0])
+  const toRank = RANKS.indexOf(move.to[1])
+
+  // Mirror rank for black (LC0 convention)
+  const fRank = isBlack ? 7 - fromRank : fromRank
+  const fFile = fromFile
+  const tRank = isBlack ? 7 - toRank : toRank
+  const tFile = toFile
+
+  const dr = tRank - fRank
+  const df = tFile - fFile
+  let plane
+
+  // Underpromotion
+  if (move.promotion && move.promotion !== 'q') {
+    const promoMap = { n: 0, b: 1, r: 2 }
+    const pieceIdx = promoMap[move.promotion]
+    if (pieceIdx === undefined) return null
+    const dirIdx = df + 1 // -1→0, 0→1, 1→2
+    if (dirIdx < 0 || dirIdx > 2) return null
+    plane = 64 + pieceIdx * 3 + dirIdx
+  } else if ((Math.abs(dr) === 2 && Math.abs(df) === 1) || (Math.abs(dr) === 1 && Math.abs(df) === 2)) {
+    // Knight move
+    const kIdx = KNIGHT_DIRS.findIndex(([r, c]) => r === dr && c === df)
+    if (kIdx === -1) return null
+    plane = 56 + kIdx
+  } else {
+    // Queen-like move (also covers pawn pushes, captures, queen promos)
+    const distance = Math.max(Math.abs(dr), Math.abs(df))
+    if (distance === 0) return null
+    const dRank = dr !== 0 ? dr / Math.abs(dr) : 0
+    const dFile = df !== 0 ? df / Math.abs(df) : 0
+    const dirIdx = QUEEN_DIRS.findIndex(([r, c]) => r === dRank && c === dFile)
+    if (dirIdx === -1) return null
+    plane = dirIdx * 7 + (distance - 1)
+  }
+
+  // Flatten (8, 8, 80) → 5120: index = rank * 640 + file * 80 + plane
+  return fRank * 640 + fFile * 80 + plane
 }
 
-// ── Move selection helpers ────────────────────────────────────
+// ── Move safety check ────────────────────────────────────────
 
 const PIECE_VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 }
 
-function isHangingMove(game, uci) {
+function isHangingMove(game, moveObj) {
   const test = new Chess(game.fen())
-  const move = test.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.length > 4 ? uci[4] : undefined })
-  if (!move) return false
-  // Check if opponent can now capture something valuable
+  const result = test.move(moveObj)
+  if (!result) return false
   const responses = test.moves({ verbose: true })
-  const captured = responses.filter((r) => r.captured)
-  for (const resp of captured) {
-    const capturedVal = PIECE_VALUES[resp.captured] || 0
-    // If they can take something worth more than what we just captured, it's hanging
-    const weCapturedVal = move.captured ? (PIECE_VALUES[move.captured] || 0) : 0
-    if (capturedVal > weCapturedVal + 1) return true
+  for (const resp of responses) {
+    if (resp.captured) {
+      const capturedVal = PIECE_VALUES[resp.captured] || 0
+      const weCapturedVal = result.captured ? (PIECE_VALUES[result.captured] || 0) : 0
+      if (capturedVal > weCapturedVal + 1) return true
+    }
   }
-  // Check if the move walks into checkmate
   if (responses.some((r) => {
     const t2 = new Chess(test.fen())
     t2.move(r)
@@ -95,6 +139,11 @@ function isHangingMove(game, uci) {
 }
 
 // ── Component ─────────────────────────────────────────────────
+
+function positionKey(fen) {
+  // First 4 FEN fields: position, turn, castling, en passant
+  return fen.split(' ').slice(0, 4).join(' ')
+}
 
 export default function ChessEngine() {
   const [game, setGame] = useState(() => new Chess())
@@ -108,10 +157,20 @@ export default function ChessEngine() {
   const [modelLoading, setModelLoading] = useState(true)
   const [modelError, setModelError] = useState(null)
   const [thinking, setThinking] = useState(false)
+  const [pendingPromotion, setPendingPromotion] = useState(null) // { from, to }
+  const [playerColor, setPlayerColor] = useState(null) // null = choosing, 'w' or 'b'
 
   const modelRef = useRef(null)
-  const vocabRef = useRef(null)
   const tfRef = useRef(null)
+  const positionCounts = useRef(new Map())
+  const gameRef = useRef(null) // persistent Chess instance with full history
+
+  // Initialize persistent game and position tracking
+  useEffect(() => {
+    gameRef.current = new Chess()
+    const key = positionKey(gameRef.current.fen())
+    positionCounts.current.set(key, 1)
+  }, [])
 
   // Load TF.js and model on mount
   useEffect(() => {
@@ -124,14 +183,10 @@ export default function ChessEngine() {
         if (cancelled) return
         tfRef.current = tf
 
-        const [model, vocabResp] = await Promise.all([
-          tf.loadLayersModel('/chess-model/model.json'),
-          fetch('/chess-model/move_vocab.json').then((r) => r.json()),
-        ])
+        const model = await tf.loadLayersModel('/chess-model/model.json')
 
         if (cancelled) return
         modelRef.current = model
-        vocabRef.current = vocabResp
         setModelLoading(false)
       } catch (err) {
         console.error('Model load error:', err)
@@ -147,73 +202,58 @@ export default function ChessEngine() {
     async (currentGame) => {
       const tf = tfRef.current
       const model = modelRef.current
-      const vocab = vocabRef.current
-      if (!tf || !model || !vocab) return null
+      if (!tf || !model) return null
 
-      const { board, aux } = encodeBoardForModel(currentGame)
-      const boardTensor = tf.tensor(board, [1, 8, 8, 12])
-      const auxTensor = tf.tensor(aux, [1, 5])
+      const board = encodeBoardForModel(currentGame)
+      const boardTensor = tf.tensor(board, [1, 8, 8, 112])
 
-      const prediction = model.predict([boardTensor, auxTensor])
-      const probs = await prediction.data()
+      const prediction = model.predict(boardTensor)
+      const logits = await prediction.data()
 
       boardTensor.dispose()
-      auxTensor.dispose()
       prediction.dispose()
 
-      // Get legal moves in UCI format
+      // Get legal moves and map to policy indices (5120-space)
       const legal = currentGame.moves({ verbose: true })
-      const legalUcis = legal.map((m) => {
-        let uci = m.from + m.to
-        if (m.promotion) uci += m.promotion
-        return uci
-      })
-
-      // Map legal moves to vocab indices with their probabilities
-      const isBlack = currentGame.turn() === 'b'
       const candidates = []
 
-      for (const uci of legalUcis) {
-        const orientedUci = isBlack ? flipUci(uci) : uci
-        const idx = vocab.indexOf(orientedUci)
-        if (idx !== -1) {
-          candidates.push({ uci, prob: probs[idx] })
+      for (const move of legal) {
+        const policyIdx = moveToPolicyIndex(currentGame, move)
+        if (policyIdx !== null && policyIdx < logits.length) {
+          candidates.push({ move, score: logits[policyIdx] })
         }
       }
 
       if (candidates.length === 0) {
-        // Fallback: pick a random legal move
         const randomIdx = Math.floor(Math.random() * legal.length)
-        return { from: legal[randomIdx].from, to: legal[randomIdx].to, promotion: legal[randomIdx].promotion }
+        return legal[randomIdx]
       }
 
-      // Sort by model confidence, pick best non-hanging move
-      candidates.sort((a, b) => b.prob - a.prob)
+      // Sort by logit score, pick best non-hanging move
+      candidates.sort((a, b) => b.score - a.score)
 
-      // Try top candidates, skip ones that hang material
-      let chosen = candidates[0].uci
       for (const c of candidates.slice(0, 5)) {
-        if (!isHangingMove(currentGame, c.uci)) {
-          chosen = c.uci
-          break
+        if (!isHangingMove(currentGame, c.move)) {
+          return c.move
         }
       }
-
-      return {
-        from: chosen.slice(0, 2),
-        to: chosen.slice(2, 4),
-        promotion: chosen.length > 4 ? chosen[4] : undefined,
-      }
+      return candidates[0].move
     },
     []
   )
+
+  const recordPosition = useCallback((fen) => {
+    const key = positionKey(fen)
+    const count = (positionCounts.current.get(key) || 0) + 1
+    positionCounts.current.set(key, count)
+    return count
+  }, [])
 
   const playModelMove = useCallback(
     async (currentGame) => {
       setThinking(true)
       setStatus('thinking...')
 
-      // Small delay so the UI updates
       await new Promise((r) => setTimeout(r, 300))
 
       const move = await getModelMove(currentGame)
@@ -222,85 +262,118 @@ export default function ChessEngine() {
         return
       }
 
-      const newGame = new Chess(currentGame.fen())
-      const result = newGame.move(move)
+      const g = gameRef.current
+      const result = g.move(move)
       if (!result) {
         setThinking(false)
         setStatus('your move')
         return
       }
 
-      setGame(newGame)
+      const count = recordPosition(g.fen())
+      setGame(new Chess(g.fen()))
       setLastMove({ from: move.from, to: move.to })
       setMoveHistory((prev) => [...prev, result.san])
       setThinking(false)
 
-      if (newGame.isGameOver()) {
-        if (newGame.isCheckmate()) {
+      if (g.isGameOver() || count >= 3) {
+        if (g.isCheckmate()) {
           setStatus('checkmate — you lose')
           setStatusClass('lost')
+        } else if (count >= 3) {
+          setStatus('draw — threefold repetition')
+          setStatusClass('')
         } else {
           setStatus('draw')
           setStatusClass('')
         }
       } else {
-        setStatus(newGame.inCheck() ? 'check — your move' : 'your move')
+        setStatus(g.inCheck() ? 'check — your move' : 'your move')
         setStatusClass('')
       }
     },
-    [getModelMove]
+    [getModelMove, recordPosition]
+  )
+
+  const executeMove = useCallback(
+    (fromSquare, toSquare, promotion) => {
+      const g = gameRef.current
+      const result = g.move({ from: fromSquare, to: toSquare, promotion })
+      if (!result) return false
+
+      const count = recordPosition(g.fen())
+      setGame(new Chess(g.fen()))
+      setLastMove({ from: fromSquare, to: toSquare })
+      setSelected(null)
+      setLegalMoves([])
+      setMoveHistory((prev) => [...prev, result.san])
+
+      if (g.isGameOver() || count >= 3) {
+        if (g.isCheckmate()) {
+          setStatus('checkmate — you win!')
+          setStatusClass('won')
+        } else if (count >= 3) {
+          setStatus('draw — threefold repetition')
+          setStatusClass('')
+        } else {
+          setStatus('draw')
+          setStatusClass('')
+        }
+      } else {
+        playModelMove(new Chess(g.fen()))
+      }
+
+      return true
+    },
+    [playModelMove, recordPosition]
   )
 
   const tryMove = useCallback(
     (fromSquare, toSquare) => {
       if (!game || thinking || game.isGameOver()) return false
-      if (game.turn() !== 'w') return false
+      if (game.turn() !== playerColor) return false
 
       const moves = game.moves({ square: fromSquare, verbose: true })
-      const targetMove = moves.find((m) => m.to === toSquare)
-      if (!targetMove) return false
+      const targetMoves = moves.filter((m) => m.to === toSquare)
+      if (targetMoves.length === 0) return false
 
-      const newGame = new Chess(game.fen())
-      const result = newGame.move({
-        from: targetMove.from,
-        to: targetMove.to,
-        promotion: targetMove.promotion || 'q',
-      })
-      if (!result) return false
-
-      setGame(newGame)
-      setLastMove({ from: targetMove.from, to: targetMove.to })
-      setSelected(null)
-      setLegalMoves([])
-      setMoveHistory((prev) => [...prev, result.san])
-
-      if (newGame.isGameOver()) {
-        if (newGame.isCheckmate()) {
-          setStatus('checkmate — you win!')
-          setStatusClass('won')
-        } else {
-          setStatus('draw')
-          setStatusClass('')
-        }
-      } else {
-        playModelMove(newGame)
+      // Check if this is a promotion move
+      if (targetMoves.some((m) => m.promotion)) {
+        setPendingPromotion({ from: fromSquare, to: toSquare })
+        return true
       }
 
-      return true
+      return executeMove(fromSquare, toSquare)
     },
-    [game, thinking, playModelMove]
+    [game, thinking, executeMove, playerColor]
   )
+
+  const handlePromotionChoice = useCallback(
+    (piece) => {
+      if (!pendingPromotion) return
+      const { from, to } = pendingPromotion
+      setPendingPromotion(null)
+      executeMove(from, to, piece)
+    },
+    [pendingPromotion, executeMove]
+  )
+
+  const cancelPromotion = useCallback(() => {
+    setPendingPromotion(null)
+    setSelected(null)
+    setLegalMoves([])
+  }, [])
 
   const handleSquareClick = useCallback(
     (square) => {
-      if (!game || thinking || game.isGameOver() || game.turn() !== 'w') return
+      if (!game || thinking || game.isGameOver() || game.turn() !== playerColor || pendingPromotion) return
 
       const piece = game.get(square)
 
       if (selected) {
         if (selected !== square && tryMove(selected, square)) return
 
-        if (piece && piece.color === 'w') {
+        if (piece && piece.color === playerColor) {
           setSelected(square)
           setLegalMoves(game.moves({ square, verbose: true }))
           return
@@ -311,22 +384,22 @@ export default function ChessEngine() {
         return
       }
 
-      if (piece && piece.color === 'w') {
+      if (piece && piece.color === playerColor) {
         setSelected(square)
         setLegalMoves(game.moves({ square, verbose: true }))
       }
     },
-    [game, selected, tryMove, thinking]
+    [game, selected, tryMove, thinking, pendingPromotion, playerColor]
   )
 
   const handleDragStart = useCallback(
     (e, square) => {
-      if (!game || thinking || game.isGameOver() || game.turn() !== 'w') {
+      if (!game || thinking || game.isGameOver() || game.turn() !== playerColor) {
         e.preventDefault()
         return
       }
       const piece = game.get(square)
-      if (!piece || piece.color !== 'w') {
+      if (!piece || piece.color !== playerColor) {
         e.preventDefault()
         return
       }
@@ -336,7 +409,7 @@ export default function ChessEngine() {
       setLegalMoves(game.moves({ square, verbose: true }))
       requestAnimationFrame(() => setDragging(square))
     },
-    [game, thinking]
+    [game, thinking, playerColor]
   )
 
   const handleDragOver = useCallback((e) => {
@@ -364,70 +437,148 @@ export default function ChessEngine() {
     setLegalMoves([])
   }, [])
 
+  const chooseColor = useCallback(
+    (color) => {
+      setPlayerColor(color)
+      if (color === 'b') {
+        const g = gameRef.current
+        playModelMove(new Chess(g.fen()))
+      } else {
+        setStatus('your move')
+      }
+    },
+    [playModelMove]
+  )
+
   const handleNewGame = useCallback(() => {
+    const fresh = new Chess()
+    gameRef.current = fresh
+    positionCounts.current = new Map()
+    positionCounts.current.set(positionKey(fresh.fen()), 1)
     setGame(new Chess())
     setSelected(null)
     setLegalMoves([])
     setLastMove(null)
     setDragging(null)
-    setStatus('your move')
+    setStatus('')
     setStatusClass('')
     setMoveHistory([])
     setThinking(false)
+    setPendingPromotion(null)
+    setPlayerColor(null)
   }, [])
 
   if (modelError) return <p className="engine-error">{modelError}</p>
   if (modelLoading) return <p className="engine-loading">Loading chess model...</p>
 
-  const board = game.board()
-  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-  const gameOver = game.isGameOver()
+  if (!playerColor) {
+    return (
+      <div className="chess-engine">
+        <div className="color-picker">
+          <p>play as</p>
+          <div className="color-options">
+            <button className="color-btn white" onClick={() => chooseColor('w')}>
+              <img src={pieceImgUrl('w', 'k')} alt="white" />
+              white
+            </button>
+            <button className="color-btn black" onClick={() => chooseColor('b')}>
+              <img src={pieceImgUrl('b', 'k')} alt="black" />
+              black
+            </button>
+          </div>
+        </div>
+        <p className="engine-explanation">
+          built on top of <a href="https://maiachess.com" target="_blank" rel="noopener noreferrer">maia chess</a> and fine-tuned to play like me using my ~2,400 rated lichess games.
+        </p>
+      </div>
+    )
+  }
+
+  const flipped = playerColor === 'b'
+  const filesArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  const repCount = positionCounts.current.get(positionKey(game.fen())) || 0
+  const gameOver = game.isGameOver() || repCount >= 3
+
+  // Build squares array with proper orientation
+  const squares = []
+  for (let displayRow = 0; displayRow < 8; displayRow++) {
+    for (let displayCol = 0; displayCol < 8; displayCol++) {
+      const rank = flipped ? displayRow : (7 - displayRow)
+      const file = flipped ? (7 - displayCol) : displayCol
+      const square = filesArr[file] + (rank + 1)
+      const piece = game.get(square)
+      squares.push({ square, piece, rank, file })
+    }
+  }
+
+  const promoCol = pendingPromotion
+    ? (flipped ? 7 - filesArr.indexOf(pendingPromotion.to[0]) : filesArr.indexOf(pendingPromotion.to[0]))
+    : 0
 
   return (
     <div className="chess-engine">
       <div className="engine-info">
-        <span>you vs me</span>
+        <span className="player-label">
+          <span className={`color-dot ${playerColor === 'w' ? 'white' : 'black'}`} />
+          you
+        </span>
+        <span className="vs-separator">vs</span>
+        <span className="player-label">
+          <span className={`color-dot ${playerColor === 'w' ? 'black' : 'white'}`} />
+          peak me (2100)
+        </span>
       </div>
       <div className="chess-board">
-        {board.map((row, rowIdx) => {
-          const rankIdx = 7 - rowIdx
-          return row.map((piece, colIdx) => {
-            const square = files[colIdx] + (rankIdx + 1)
-            const isLight = (rankIdx + colIdx) % 2 === 0
-            const isSelected = selected === square
-            const isLegalTarget = legalMoves.some((m) => m.to === square)
-            const isLastMove = lastMove && (lastMove.from === square || lastMove.to === square)
-            const hasPiece = !!piece
+        {squares.map(({ square, piece, rank, file }) => {
+          const isLight = (rank + file) % 2 === 0
+          const isSelected = selected === square
+          const isLegalTarget = !pendingPromotion && legalMoves.some((m) => m.to === square)
+          const isLastMove = lastMove && (lastMove.from === square || lastMove.to === square)
+          const hasPiece = !!piece
 
-            let className = `chess-square ${isLight ? 'light' : 'dark'}`
-            if (isSelected) className += ' selected'
-            if (isLastMove && !isSelected) className += ' last-move'
-            if (isLegalTarget) className += ' legal-target'
-            if (isLegalTarget && hasPiece) className += ' has-piece'
+          let className = `chess-square ${isLight ? 'light' : 'dark'}`
+          if (isSelected) className += ' selected'
+          if (isLastMove && !isSelected) className += ' last-move'
+          if (isLegalTarget) className += ' legal-target'
+          if (isLegalTarget && hasPiece) className += ' has-piece'
 
-            return (
-              <div
-                key={square}
-                className={className}
-                onClick={() => handleSquareClick(square)}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, square)}
-              >
-                {piece && (
-                  <img
-                    src={pieceImgUrl(piece.color, piece.type)}
-                    alt=""
-                    draggable={piece.color === 'w' && !thinking && !gameOver}
-                    onDragStart={(e) => handleDragStart(e, square)}
-                    onDragEnd={handleDragEnd}
-                    className="chess-piece-img"
-                    style={dragging === square ? { visibility: 'hidden' } : undefined}
-                  />
-                )}
-              </div>
-            )
-          })
+          return (
+            <div
+              key={square}
+              className={className}
+              onClick={() => pendingPromotion ? cancelPromotion() : handleSquareClick(square)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, square)}
+            >
+              {piece && (
+                <img
+                  src={pieceImgUrl(piece.color, piece.type)}
+                  alt=""
+                  draggable={piece.color === playerColor && !thinking && !gameOver && !pendingPromotion}
+                  onDragStart={(e) => handleDragStart(e, square)}
+                  onDragEnd={handleDragEnd}
+                  className="chess-piece-img"
+                  style={dragging === square ? { visibility: 'hidden' } : undefined}
+                />
+              )}
+            </div>
+          )
         })}
+        {pendingPromotion && (
+          <div className="promotion-overlay" onClick={cancelPromotion}>
+            <div
+              className="promotion-picker"
+              style={{ '--promo-col': promoCol }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {['q', 'r', 'b', 'n'].map((p) => (
+                <div key={p} className="promotion-option" onClick={() => handlePromotionChoice(p)}>
+                  <img src={pieceImgUrl(playerColor, p)} alt={p} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <div className="engine-controls">
         <p className={`engine-status ${statusClass}`}>{status}</p>
@@ -448,7 +599,7 @@ export default function ChessEngine() {
         </div>
       )}
       <p className="engine-explanation">
-        this model was trained on my {'\u007E'}2,400 rated games on <a href="https://lichess.org/@/stevyk6" target="_blank" rel="noopener noreferrer">lichess</a>. it learned how i play, not how to play well.
+        built on top of <a href="https://maiachess.com" target="_blank" rel="noopener noreferrer">maia chess</a> and fine-tuned to play like me using my ~2,400 rated lichess games.
       </p>
     </div>
   )

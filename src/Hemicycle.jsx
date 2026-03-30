@@ -7,7 +7,7 @@ const PARTIES = [
   { id: 'dpp', name: 'DPP', color: '#1B9431', seats: 51 },
   { id: 'tpp', name: 'TPP', color: '#28C8C8', seats: 8 },
   { id: 'ind', name: 'Independent', color: '#CCCCCC', seats: 2 },
-  { id: 'kmt', name: 'KMT', color: '#000099', seats: 52 },
+  { id: 'kmt', name: 'KMT', color: '#3366cc', seats: 52 },
 ]
 
 // All 113 legislators ordered by party (DPP, TPP, Ind, KMT) for left-to-right hemicycle assignment
