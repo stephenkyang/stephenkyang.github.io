@@ -252,6 +252,16 @@
   font-weight: 400;
 }
 
+.writing-detail-content a {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.writing-detail-content a:hover {
+  color: var(--link-hover);
+}
+
 /* Project detail */
 .project-detail {
   max-width: 640px;
@@ -376,12 +386,12 @@
 }
 
 .vibecoded a {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-decoration: underline;
 }
 
 .vibecoded a:hover {
-  color: var(--text-secondary);
+  color: var(--text);
 }
 
 /* Responsive */
