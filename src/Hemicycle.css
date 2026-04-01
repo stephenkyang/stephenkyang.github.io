@@ -102,7 +102,7 @@
 }
 
 .hemicycle-tooltip-trip a {
-  color: #8cb4ff;
+  color: var(--link);
   font-size: 0.7rem;
   text-decoration: underline;
 }

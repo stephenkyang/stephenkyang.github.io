@@ -253,7 +253,7 @@
 }
 
 .writing-detail-content a {
-  color: var(--text);
+  color: var(--link);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -386,12 +386,12 @@
 }
 
 .vibecoded a {
-  color: var(--text-secondary);
+  color: var(--link);
   text-decoration: underline;
 }
 
 .vibecoded a:hover {
-  color: var(--text);
+  color: var(--link-hover);
 }
 
 /* Responsive */

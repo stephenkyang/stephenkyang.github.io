@@ -226,7 +226,7 @@
 }
 
 .esp-tooltip-sources a {
-  color: #8cb4ff;
+  color: var(--link);
   font-size: 0.65rem;
   text-decoration: underline;
 }
