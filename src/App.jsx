@@ -3,7 +3,6 @@ import './App.css'
 import ChessPuzzle from './ChessPuzzle'
 import WritingDetail from './WritingDetail'
 import writings, { TAGS } from './writings'
-import Hemicycle from './Hemicycle'
 import PairsTrading from './PairsTrading'
 
 const ChessEngine = lazy(() => import('./ChessEngine'))
@@ -163,7 +162,7 @@ function App() {
             <Suspense fallback={<p style={{ color: '#555', fontSize: '0.85rem' }}>Loading chess engine...</p>}>
               <ChessEngine />
             </Suspense>
-          ) : page.id === 'chess-puzzles' ? <ChessPuzzle /> : page.id === 'taiwan-hemicycle' ? <Hemicycle /> : page.id === 'pairs-trading' ? <PairsTrading /> : <p>TBD</p>}
+          ) : page.id === 'chess-puzzles' ? <ChessPuzzle /> : page.id === 'pairs-trading' ? <PairsTrading /> : <p>TBD</p>}
         </div>
         <button className="bottom-home-link" onClick={() => setPage({ type: 'home' })}>
           Home
