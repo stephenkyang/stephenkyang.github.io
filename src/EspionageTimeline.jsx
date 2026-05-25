@@ -30,7 +30,7 @@ const CASES = [
     branch: 'military',
     details: 'Recruited by Hong Kong businessman acting for China\'s state security ministry. Approached at least 5 senior officers incl. former Vice Defense Minister Chang Che-ping.',
     outcome: 'Found guilty Jan 2023. Suspended sentences up to 5 years and fines up to NT$600,000.',
-    sources: ['https://www.rfa.org/english/news/southchinasea/taiwan-spies-01112023063004.html'],
+    sources: ['https://www.taipeitimes.com/News/taiwan/archives/2023/01/11/2003792397'],
   },
   {
     date: 'Feb 2021',
@@ -48,7 +48,7 @@ const CASES = [
     branch: 'military',
     details: 'Investigated for alleged contact with Chinese spy ring. Had served as Vice Minister of Defense 2019–2021 and as strategic adviser to President Tsai.',
     outcome: 'Not found guilty; reclassified as witness.',
-    sources: ['https://www.rfa.org/english/news/southchinasea/taiwan-spies-01112023063004.html'],
+    sources: ['https://asia.nikkei.com/Politics/International-relations/Taiwan-ex-deputy-defense-minister-probed-for-China-spy-contacts'],
   },
   {
     date: 'Nov 2022',
@@ -57,7 +57,7 @@ const CASES = [
     branch: 'military',
     details: 'Arrested after entering Zuoying Navy Base in Kaohsiung with a forged ID.',
     outcome: 'Under investigation.',
-    sources: ['https://www.rfa.org/english/news/southchinasea/taiwan-spies-01112023063004.html'],
+    sources: ['https://www.taipeitimes.com/News/taiwan/archives/2022/11/24/2003789516'],
   },
   {
     date: 'Nov 2022',
@@ -65,8 +65,8 @@ const CASES = [
     individuals: 'Col. Hsiang Te-en (on Kinmen)',
     branch: 'military',
     details: 'Army colonel on frontline island of Kinmen discovered working for China. Pledged allegiance to China and promised to surrender in event of Chinese attack.',
-    outcome: 'Suspended and under investigation.',
-    sources: ['https://www.rfa.org/english/news/southchinasea/taiwan-spies-01112023063004.html'],
+    outcome: 'Sentenced 7.5 years Feb 2023.',
+    sources: ['https://www.taipeitimes.com/News/front/archives/2022/11/23/2003789444'],
   },
   {
     date: 'Jan 2023',
@@ -75,7 +75,7 @@ const CASES = [
     branch: 'military',
     details: 'Seven members of spy ring arrested in Kaohsiung. Retired colonel Liu ran espionage activities for at least 8 years. Six recruited from Navy and Air Force; 3 active-duty.',
     outcome: 'Arrested Jan 6, 2023.',
-    sources: ['https://www.rfa.org/english/news/southchinasea/taiwan-spies-01112023063004.html'],
+    sources: ['https://www.taipeitimes.com/News/taiwan/archives/2023/01/05/2003792035'],
   },
   {
     date: 'Mar 2023',
@@ -83,8 +83,8 @@ const CASES = [
     individuals: 'Ret. Rear Adm. Hsia Fu-hsiang; Fmr. Legislator Lo Chih-ming',
     branch: 'political',
     details: 'Charged with organizing meetings between former senior military officers and Chinese intelligence. Recruited by Chinese military and United Front Work Department.',
-    outcome: 'Charged Mar 2023. Each faces up to 5 years.',
-    sources: ['https://en.wikipedia.org/wiki/Chinese_intelligence_activity_abroad'],
+    outcome: 'Charged Mar 2023. Lo acquitted in final Supreme Court ruling; partial retrial ordered for Hsia.',
+    sources: ['https://www.taipeitimes.com/News/taiwan/archives/2023/03/17/2003796255'],
   },
   {
     date: 'Apr 2023',
@@ -176,8 +176,8 @@ const CASES = [
     individuals: 'Fmr. airman Hsueh Chen-chun',
     branch: 'military',
     details: 'Recruited by two MSS officials during business trip to China in 2014. Tasked with collecting intelligence on Falun Gong founder Li Hongzhi (US citizen) from a Taiwanese investigator.',
-    outcome: 'Sentenced 14 months.',
-    sources: ['https://www.ntd.com/taiwan-sentences-ex-military-officer-for-spying-on-falun-gong_1087014.html'],
+    outcome: 'Initially sentenced 14 months; High Court acquitted on retrial.',
+    sources: ['https://news.ltn.com.tw/news/society/breakingnews/3649604'],
   },
   {
     date: 'Nov 2025',
@@ -257,20 +257,17 @@ function VerticalTimeline({ showTooltip, scheduleHide }) {
       {CASES.map((c, i) => {
         const isLeft = i % 2 === 0
         return (
-          <div key={i} className={`esp-v-event ${isLeft ? 'esp-v-left' : 'esp-v-right'}`}>
-            <div
-              className="esp-v-dot"
-              style={{ backgroundColor: branchColor(c.branch) }}
-              onMouseEnter={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                showTooltip({
-                  x: rect.left + rect.width / 2,
-                  y: rect.top,
-                  caseData: c,
-                })
-              }}
-              onMouseLeave={scheduleHide}
-            />
+          <div
+            key={i}
+            className={`esp-v-event ${isLeft ? 'esp-v-left' : 'esp-v-right'}`}
+            onMouseEnter={(e) => {
+              const card = e.currentTarget.querySelector('.esp-v-card')
+              const rect = card.getBoundingClientRect()
+              showTooltip({ x: rect.left + rect.width / 2, y: rect.top, caseData: c })
+            }}
+            onMouseLeave={scheduleHide}
+          >
+            <div className="esp-v-dot" style={{ backgroundColor: branchColor(c.branch) }} />
             <div className="esp-v-card">
               <div className="esp-v-date">{c.date}</div>
               <div className="esp-v-individuals">{c.individuals}</div>
@@ -296,7 +293,7 @@ export default function EspionageTimeline({ collapsible = false }) {
   }, [])
 
   const scheduleHide = useCallback(() => {
-    hideTimeout.current = setTimeout(() => setTooltip(null), 150)
+    hideTimeout.current = setTimeout(() => setTooltip(null), 300)
   }, [])
 
   return (

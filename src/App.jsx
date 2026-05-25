@@ -248,6 +248,14 @@ function App() {
             I&apos;m a software engineer at Wing, working on automating traffic management for UAVs (drones). In the past, I worked at DoorDash where I created agentic workflows to
             automate fraud detection and customer support processes.
           </p>
+          <div className="interests">
+            <p className="interests-header">My interests include:</p>
+            <ul className="interests-list">
+              <li><strong>Conflict Theory:</strong> Power transitions, the Thucydides Trap, and whether multipolarity makes great power conflict more or less likely</li>
+              <li><strong>Domestic Policy:</strong> How do we build a prosperous country for everyone through equity of opportunity</li>
+              <li><strong>Trade Policy:</strong> Export controls, tariffs, and the case for strategic trade intervention</li>
+            </ul>
+          </div>
         </section>
       </main>
 

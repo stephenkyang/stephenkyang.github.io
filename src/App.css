@@ -75,6 +75,38 @@
   font-weight: 400;
 }
 
+.interests {
+  margin-top: 1.5rem;
+}
+
+.interests-header {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.interests-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.interests-list li {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.interest-label {
+  color: var(--text);
+  font-weight: 400;
+}
+
 .portrait img {
   width: 140px;
   height: 140px;
