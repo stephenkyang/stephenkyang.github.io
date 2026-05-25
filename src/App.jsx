@@ -252,15 +252,15 @@ function App() {
             <p className="interests-header">My interests include:</p>
             <ul className="interests-list">
               <li><strong>Conflict Theory:</strong> Power transitions, the Thucydides Trap, and whether multipolarity makes great power conflict more or less likely</li>
-              <li><strong>Domestic Policy:</strong> How do we build a prosperous country for everyone through equity of opportunity</li>
               <li><strong>Trade Policy:</strong> Export controls, tariffs, and the case for strategic trade intervention</li>
+              <li><strong>Domestic Policy:</strong> How do we build a prosperous country for everyone through equity of opportunity</li>
             </ul>
           </div>
         </section>
       </main>
 
-      <button className="recent-project" onClick={() => setPage({ type: 'project-detail', id: 'chess-engine' })}>
-        last update: play chess with me (feb 2026)
+      <button className="recent-project" onClick={() => setPage({ type: 'writing-detail', slug: 'taiwan-fifth-column' })}>
+        last update: taiwan&apos;s fifth column (feb 2026)
       </button>
 
       <div className="bottom-right">
