@@ -4,6 +4,7 @@ import ChessPuzzle from './ChessPuzzle'
 import WritingDetail from './WritingDetail'
 import writings, { TAGS } from './writings'
 import PairsTrading from './PairsTrading'
+import ChineseInfluenceInTaiwanPrint from './ChineseInfluenceInTaiwanPrint'
 
 const ChessEngine = lazy(() => import('./ChessEngine'))
 
@@ -30,6 +31,7 @@ function App() {
 
   const [page, setPage] = useState(() => {
     const path = typeof window !== 'undefined' ? window.location.pathname : '/'
+    if (path === '/print/chinese_influence_in_taiwan') return { type: 'print-taiwan' }
     if (path.startsWith('/writings/')) {
       return { type: 'writing-detail', slug: path.replace('/writings/', '') }
     }
@@ -77,6 +79,11 @@ function App() {
     }
   }, [page])
 
+  // Print view
+  if (page.type === 'print-taiwan') {
+    return <ChineseInfluenceInTaiwanPrint />
+  }
+
   // Writing detail page
   if (page.type === 'writing-detail') {
     const writing = writings.find((w) => w.slug === page.slug)
@@ -103,7 +110,7 @@ function App() {
 
   // Writings list page
   if (page.type === 'writings') {
-    const filtered = filter === 'all' ? writings : writings.filter((w) => w.tag === filter)
+    const filtered = filter === 'all' ? writings : writings.filter((w) => Array.isArray(w.tags) ? w.tags.includes(filter) : w.tag === filter)
     return (
       <div className="projects-page">
         <header className="projects-header">
@@ -226,7 +233,7 @@ function App() {
       <header className="top-bar">
         <div className="name-block">
           <p className="name">Stephen Yang</p>
-          <p className="email">stephenkyang [at] wing [dot] com</p>
+          <p className="email">yangstephenk [at] gmail [dot] com</p>
           <a className="linkedin-link" href="https://linkedin.com/in/stephen-yang-" target="_blank" rel="noopener noreferrer">
             LinkedIn
           </a>
@@ -259,8 +266,8 @@ function App() {
         </section>
       </main>
 
-      <button className="recent-project" onClick={() => setPage({ type: 'writing-detail', slug: 'taiwan-fifth-column' })}>
-        last update: taiwan&apos;s fifth column (feb 2026)
+      <button className="recent-project" onClick={() => setPage({ type: 'writing-detail', slug: 'chinese_influence_in_taiwan' })}>
+        last update: beijing doesn't need to invade (may 2026)
       </button>
 
       <div className="bottom-right">

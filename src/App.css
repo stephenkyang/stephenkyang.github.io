@@ -261,6 +261,14 @@
   line-height: 1.2;
 }
 
+.writing-detail-subtitle {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
 .writing-detail-date {
   font-size: 0.85rem;
   color: var(--text-muted);

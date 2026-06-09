@@ -1,15 +1,17 @@
 import DebtProjection from './DebtProjection'
-import TaiwanFifthColumn from './TaiwanFifthColumn'
+import ChineseInfluenceInTaiwan from './ChineseInfluenceInTaiwan'
+import ForceCorollary from './ForceCorollary'
 
 export const TAGS = ['all', 'domestic policy', 'foreign policy', 'ai']
 
 const writings = [
   {
-    slug: 'taiwan-fifth-column',
-    title: 'Taiwan’s Fifth Column',
-    date: 'feb 2026',
+    slug: 'chinese_influence_in_taiwan',
+    title: 'Beijing Doesn\'t Need to Invade',
+    subtitle: 'How China Exploits the Gaps in Taiwan\'s Institutions',
+    date: 'may 2026',
     tag: 'foreign policy',
-    component: TaiwanFifthColumn,
+    component: ChineseInfluenceInTaiwan,
   },
   {
     slug: 'severity-of-us-debt',
@@ -17,6 +19,13 @@ const writings = [
     date: 'mar 2026',
     tag: 'domestic policy',
     component: DebtProjection,
+  },
+  {
+    slug: 'force-corollary',
+    title: 'The Contestable Force Corollary to the Intelligence Curse',
+    date: 'feb 2026',
+    tags: ['ai', 'domestic policy'],
+    component: ForceCorollary,
   },
 ]
 
