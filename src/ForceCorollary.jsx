@@ -20,10 +20,8 @@ const Ref = ({ children }) => (
 export default function ForceCorollary() {
   return (
     <div>
-      <blockquote style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: '1rem', lineHeight: 1.7, color: 'var(--writing-body)', margin: '0 0 2rem', paddingLeft: '1.5rem', borderLeft: '3px solid var(--border)', fontStyle: 'normal' }}>
-        This essay proposes a diagnostic for evaluating the policies <em>The Intelligence Curse</em> (Drago &amp; Laine, 2025) recommends. It asks of each one whether the policy preserves the public&apos;s capacity to refuse. The Intelligence Curse presents several policy options, which can generally be grouped into three broad categories.
-      </blockquote>
-
+      <P>This essay proposes a diagnostic for evaluating the policies <em>The Intelligence Curse</em> (Drago &amp; Laine, 2025) recommends. It asks of each one whether the policy preserves the public&apos;s capacity to refuse.</P>
+      <P>The Intelligence Curse presents several policy options, which can generally be grouped into three broad categories.</P>
       <ol style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: '1.1rem', lineHeight: 1.7, color: 'var(--writing-body)', margin: '0 0 1.2rem', paddingLeft: '1.5rem' }}>
         <li style={{ marginBottom: '0.5rem', fontWeight: 400 }}><strong>Aversion</strong> is the prevention of catastrophes such as engineered pandemics and large-scale cyberattacks.</li>
         <li style={{ marginBottom: '0.5rem', fontWeight: 400 }}><strong>Diffusion</strong> is the spreading of user-aligned AI and the fair allocation of the benefits derived from it (for example, universal basic compute).</li>
