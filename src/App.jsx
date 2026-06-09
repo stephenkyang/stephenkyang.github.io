@@ -258,7 +258,7 @@ function App() {
           <div className="interests">
             <p className="interests-header">My interests include:</p>
             <ul className="interests-list">
-              <li><strong>Conflict Theory:</strong> Power transitions, the Thucydides Trap, and whether multipolarity makes great power conflict more or less likely</li>
+              <li><strong>International Relations:</strong> Power transitions, the Thucydides Trap, and whether multipolarity makes great power conflict more or less likely</li>
               <li><strong>Trade Policy:</strong> Export controls, tariffs, and the case for strategic trade intervention</li>
               <li><strong>Domestic Policy:</strong> How do we build a prosperous country for everyone through equity of opportunity</li>
             </ul>
