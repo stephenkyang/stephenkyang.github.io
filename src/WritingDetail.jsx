@@ -8,6 +8,9 @@ export default function WritingDetail({ writing }) {
       {writing.subtitle && (
         <p className="writing-detail-subtitle">{writing.subtitle}</p>
       )}
+      {writing.description && (
+        <p className="writing-detail-subtitle">{writing.description}</p>
+      )}
       <p className="writing-detail-date">{writing.date}</p>
       {writing.image && (
         <img className="writing-detail-image" src={writing.image} alt="" />

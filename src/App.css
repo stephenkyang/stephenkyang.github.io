@@ -265,8 +265,17 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1rem;
   font-style: italic;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+}
+
+.writing-detail-description {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
   color: var(--text-secondary);
   margin: 0 0 0.5rem;
+  font-weight: 400;
 }
 
 .writing-detail-date {

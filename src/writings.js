@@ -23,6 +23,7 @@ const writings = [
   {
     slug: 'force-corollary',
     title: 'The Contestable Force Corollary to the Intelligence Curse',
+    description: 'This essay proposes a diagnostic for evaluating the policies The Intelligence Curse (Drago & Laine, 2025) recommends. It asks of each one whether the policy preserves the public\'s capacity to refuse.',
     date: 'feb 2026',
     tags: ['ai', 'domestic policy'],
     component: ForceCorollary,
