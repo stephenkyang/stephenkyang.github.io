@@ -446,12 +446,28 @@
 /* Responsive */
 @media (max-width: 640px) {
   .app-shell,
-  .projects-page {
-    padding: 1.5rem;
+  .projects-page,
+  .not-found-page {
+    padding: 1.25rem;
+  }
+
+  .top-bar {
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  .name-block .email {
+    display: none;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
   }
 
   .bottom-right {
-    max-width: 40%;
+    display: none;
   }
 
   .vibecoded {
@@ -459,15 +475,15 @@
   }
 
   .bottom-home-link {
-    bottom: 1.5rem;
-    left: 1.5rem;
-    max-width: 40%;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    max-width: 45%;
   }
 
   .recent-project {
-    bottom: 1.5rem;
-    left: 1.5rem;
-    max-width: 55%;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    max-width: 60%;
     text-align: left;
     font-size: 0.75rem;
   }
@@ -475,10 +491,52 @@
   .landing {
     flex-direction: column;
     gap: 1.5rem;
+    align-items: flex-start;
+    padding-bottom: 4rem;
   }
 
   .portrait img {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
+  }
+
+  /* Writing list */
+  .writing-tags {
+    margin: 1.5rem auto 0;
+    gap: 1rem;
+  }
+
+  .writing-list {
+    margin: 1rem auto 0;
+  }
+
+  .writing-row {
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.75rem 0;
+  }
+
+  .writing-row-date {
+    margin-left: 0;
+    font-size: 0.8rem;
+  }
+
+  /* Project list */
+  .project-list {
+    margin: 2rem auto 0;
+  }
+
+  /* Writing detail */
+  .writing-detail-wrapper {
+    margin: 1.5rem auto 0;
+    padding-bottom: 4rem;
+  }
+
+  .writing-detail-title {
+    font-size: 1.4rem;
+  }
+
+  .writing-detail-content p {
+    font-size: 1rem;
   }
 }
