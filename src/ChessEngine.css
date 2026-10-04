@@ -1,0 +1,263 @@
+.chess-engine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chess-engine .engine-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.player-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.vs-separator {
+  color: var(--text-muted);
+}
+
+.color-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.color-dot.white {
+  background: #e0e0e0;
+  border: 1px solid var(--text-muted);
+}
+
+.color-dot.black {
+  background: #1a1a1a;
+  border: 1px solid var(--text-muted);
+}
+
+.chess-engine .chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: min(400px, calc(100vw - 3rem));
+  height: min(400px, calc(100vw - 3rem));
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.chess-engine .chess-square {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.chess-engine .chess-piece-img {
+  width: 85%;
+  height: 85%;
+}
+
+.chess-engine .chess-piece-img[draggable='true'] {
+  cursor: grab;
+}
+
+.chess-engine .chess-piece-img[draggable='true']:active {
+  cursor: grabbing;
+}
+
+.chess-engine .chess-square.light {
+  background: #f0d9b5;
+}
+
+.chess-engine .chess-square.dark {
+  background: #c49b6e;
+}
+
+.chess-engine .chess-square.selected {
+  background: #829769;
+}
+
+.chess-engine .chess-square.legal-target::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.chess-engine .chess-square.legal-target.has-piece::after {
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: transparent;
+  border: 3px solid rgba(0, 0, 0, 0.2);
+}
+
+.chess-engine .chess-square.last-move.light {
+  background: #cdd16a;
+}
+
+.chess-engine .chess-square.last-move.dark {
+  background: #aaa23a;
+}
+
+.engine-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.engine-status {
+  font-size: 0.9rem;
+  min-height: 1.4rem;
+}
+
+.engine-status.won {
+  color: var(--success);
+}
+
+.engine-status.lost {
+  color: var(--error);
+}
+
+.new-game-btn {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--text);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.new-game-btn:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.move-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  max-width: min(400px, calc(100vw - 3rem));
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  max-height: 6rem;
+  overflow-y: auto;
+}
+
+.move-entry {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.move-number {
+  color: var(--text-muted);
+}
+
+.engine-loading {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.engine-error {
+  color: var(--error);
+  font-size: 0.85rem;
+}
+
+.engine-explanation {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  max-width: min(400px, calc(100vw - 3rem));
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.engine-explanation a {
+  color: var(--link);
+}
+
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.color-picker p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.color-options {
+  display: flex;
+  gap: 1rem;
+}
+
+.color-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--color-btn-bg);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.color-btn img {
+  width: 48px;
+  height: 48px;
+}
+
+.color-btn:hover {
+  background: var(--border);
+}
+
+.promotion-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.promotion-picker {
+  position: absolute;
+  top: 0;
+  left: calc(var(--promo-col) * 12.5%);
+  width: 12.5%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.promotion-option {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #f0d9b5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.promotion-option:hover {
+  background: #829769;
+}
+
+.promotion-option img {
+  width: 85%;
+  height: 85%;
+}
